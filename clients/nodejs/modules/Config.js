@@ -16,8 +16,9 @@ const TAG = 'Config';
  * @property {boolean} passive
  * @property {number} statistics
  * @property {{enabled: boolean, threads: string|number, throttleAfter: number, throttleWait: number, extraData: string}} miner
- * @property {{enabled: boolean, host: string, port: number}} poolMining
+ * @property {{enabled: boolean, host: string, port: number, mode: string}} poolMining
  * @property {{enabled: boolean, port: number, corsdomain: string|Array.<string>, allowip: string|Array.<string>, username: string, password: string}} rpcServer
+ * @property {{enabled: boolean, port: number}} uiServer
  * @property {{enabled: boolean, port: number, password: string}} metricsServer
  * @property {{seed: string, address: string}} wallet
  * @property {{enabled: boolean, port: number, address: string, header: string}} reverseProxy
@@ -58,8 +59,13 @@ const DEFAULT_CONFIG = /** @type {Config} */ {
         port: 8648,
         corsdomain: null,
         allowip: null,
+        methods: null,
         username: null,
         password: null
+    },
+    uiServer: {
+        enabled: false,
+        port: 8650
     },
     metricsServer: {
         enabled: false,
@@ -123,8 +129,15 @@ const CONFIG_TYPES = {
             port: 'number',
             corsdomain: {type: 'mixed', types: ['string', {type: 'array', inner: 'string'}]},
             allowip: {type: 'mixed', types: ['string', {type: 'array', inner: 'string'}]},
+            methods: {type: 'array', inner: 'string'},
             username: 'string',
             password: 'string'
+        }
+    },
+    uiServer: {
+        type: 'object', sub: {
+            enabled: 'boolean',
+            port: 'number'
         }
     },
     metricsServer: {
@@ -327,6 +340,11 @@ function readFromArgs(argv, config = merge({}, DEFAULT_CONFIG)) {
         config.rpcServer.enabled = true;
         if (typeof argv.rpc === 'number') config.rpcServer.port = argv.rpc;
         if (typeof argv.rpc === 'string') config.rpcServer.port = parseInt(argv.rpc);
+    }
+    if (argv.ui) {
+        config.uiServer.enabled = true;
+        if (typeof argv.ui === 'number') config.uiServer.port = argv.ui;
+        if (typeof argv.ui === 'string') config.uiServer.port = parseInt(argv.ui);
     }
     if (argv.metrics) {
         config.metricsServer.enabled = true;

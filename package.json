@@ -1,13 +1,13 @@
 {
   "name": "@nimiq/core",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "main": "dist/node.js",
   "homepage": "https://nimiq.com/",
   "description": "",
   "scripts": {
     "prepare": "gulp build-node",
     "build": "gulp build",
-    "build-deb": "gulp --architecture=`dpkg --print-architecture` prepare-packages && cd packaging/BUILD && mv build/nimiq_node_generic.node build/nimiq_node.node && mv fakeroot/etc/nimiq/sample.conf fakeroot/etc/nimiq/nimiq.conf && node-deb --no-default-package-dependencies x -- node *.js cron-deb.sh VERSION build/ lib/ modules/ && mv *.deb ../../dist/",
+    "build-deb": "gulp --architecture=`dpkg --print-architecture` prepare-packages && cd packaging/BUILD && mv build/nimiq_node_generic.node build/nimiq_node.node && mv fakeroot/etc/nimiq/sample.conf fakeroot/etc/nimiq/nimiq.conf && node-deb --no-default-package-dependencies x -- node *.js cron-deb.sh VERSION build/ lib/ modules/ node-ui/ && mv *.deb ../../dist/",
     "build-rpm": "gulp --architecture=`arch` prepare-packages && cd packaging && mv BUILD/build/nimiq_node_generic.node BUILD/build/nimiq_node.node && mv BUILD/fakeroot/etc/nimiq/sample.conf BUILD/fakeroot/etc/nimiq/nimiq.conf && rpmbuild -bb SPECS/nimiq.spec && mv RPMS/x86_64/*.rpm ../dist",
     "esdoc": "esdoc",
     "test": "jasmine && gulp test",
@@ -37,7 +37,7 @@
   ],
   "node_deb": {
     "package_name": "nimiq",
-    "version": "1.2.0-1",
+    "version": "1.3.0-1",
     "init": "systemd",
     "architecture": "none",
     "install_strategy": "copy",
@@ -58,7 +58,7 @@
   },
   "gypfile": true,
   "dependencies": {
-    "@nimiq/jungle-db": "^0.9.14",
+    "@nimiq/jungle-db": "^0.9.17",
     "atob": "^2.0.3",
     "bindings": "^1.3.0",
     "btoa": "^1.1.2",

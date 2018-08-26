@@ -24,7 +24,8 @@ const sources = {
             './src/main/platform/browser/crypto/CryptoLib.js',
             './src/main/platform/browser/network/webrtc/WebRtcFactory.js',
             './src/main/platform/browser/network/websocket/WebSocketFactory.js',
-            './src/main/platform/browser/network/DnsUtils.js'
+            './src/main/platform/browser/network/DnsUtils.js',
+            './src/main/platform/browser/network/HttpRequest.js'
         ],
         offline: [
             './src/main/platform/browser/Class.js',
@@ -41,7 +42,8 @@ const sources = {
             './src/main/platform/nodejs/crypto/CryptoLib.js',
             './src/main/platform/nodejs/network/webrtc/WebRtcFactory.js',
             './src/main/platform/nodejs/network/websocket/WebSocketFactory.js',
-            './src/main/platform/nodejs/network/DnsUtils.js'
+            './src/main/platform/nodejs/network/DnsUtils.js',
+            './src/main/platform/nodejs/network/HttpRequest.js'
         ]
     },
     generic: [
@@ -75,12 +77,15 @@ const sources = {
         './src/main/generic/utils/WasmHelper.js',
         './src/main/generic/utils/crypto/CryptoWorker.js',
         './src/main/generic/utils/crypto/CryptoWorkerImpl.js',
+        './src/main/generic/utils/crypto/CryptoUtils.js',
+        './src/main/generic/utils/crc/CRC8.js',
         './src/main/generic/utils/crc/CRC32.js',
         './src/main/generic/utils/number/BigNumber.js',
         './src/main/generic/utils/number/NumberUtils.js',
         './src/main/generic/utils/merkle/MerkleTree.js',
         './src/main/generic/utils/merkle/MerklePath.js',
         './src/main/generic/utils/merkle/MerkleProof.js',
+        './src/main/generic/utils/mnemonic/MnemonicUtils.js',
         './src/main/generic/utils/platform/PlatformUtils.js',
         './src/main/generic/utils/string/StringUtils.js',
         './src/main/generic/consensus/Policy.js',
@@ -89,6 +94,8 @@ const sources = {
         './src/main/generic/consensus/base/primitive/PrivateKey.js',
         './src/main/generic/consensus/base/primitive/PublicKey.js',
         './src/main/generic/consensus/base/primitive/KeyPair.js',
+        './src/main/generic/consensus/base/primitive/Entropy.js',
+        './src/main/generic/consensus/base/primitive/ExtendedPrivateKey.js',
         './src/main/generic/consensus/base/primitive/RandomSecret.js',
         './src/main/generic/consensus/base/primitive/Signature.js',
         './src/main/generic/consensus/base/primitive/Commitment.js',
@@ -192,6 +199,8 @@ const sources = {
         './src/main/generic/network/address/PeerId.js',
         './src/main/generic/network/address/PeerAddress.js',
         './src/main/generic/network/address/PeerAddressState.js',
+        './src/main/generic/network/address/SeedList.js',
+        './src/main/generic/network/address/PeerAddressSeeder.js',
         './src/main/generic/network/address/PeerAddressBook.js',
         './src/main/generic/consensus/GenesisConfig.js',
         './src/main/generic/network/connection/CloseType.js',
@@ -224,9 +233,11 @@ const sources = {
         './src/main/generic/utils/assert/Assert.js',
         './src/main/generic/utils/buffer/BufferUtils.js',
         './src/main/generic/utils/buffer/SerialBuffer.js',
+        './src/main/generic/utils/crc/CRC8.js',
         './src/main/generic/utils/number/BigNumber.js',
         './src/main/generic/utils/number/NumberUtils.js',
         './src/main/generic/utils/merkle/MerklePath.js',
+        './src/main/generic/utils/mnemonic/MnemonicUtils.js',
         './src/main/generic/utils/platform/PlatformUtils.js',
         './src/main/generic/utils/string/StringUtils.js',
         './src/main/generic/consensus/Policy.js',
@@ -235,6 +246,8 @@ const sources = {
         './src/main/generic/consensus/base/primitive/PrivateKey.js',
         './src/main/generic/consensus/base/primitive/PublicKey.js',
         './src/main/generic/consensus/base/primitive/KeyPair.js',
+        './src/main/generic/consensus/base/primitive/Entropy.js',
+        './src/main/generic/consensus/base/primitive/ExtendedPrivateKey.js',
         './src/main/generic/consensus/base/primitive/RandomSecret.js',
         './src/main/generic/consensus/base/primitive/Signature.js',
         './src/main/generic/consensus/base/primitive/Commitment.js',
@@ -249,6 +262,7 @@ const sources = {
         './src/main/generic/utils/IWorker.js',
         './src/main/generic/utils/WasmHelper.js',
         './src/main/generic/utils/crypto/CryptoWorker.js',
+        './src/main/generic/utils/crypto/CryptoUtils.js',
         './src/main/generic/consensus/GenesisConfigOffline.js'
     ],
     test: [
@@ -541,15 +555,17 @@ const RELEASE_SOURCES = [
 const RELEASE_LIB = [
     'dist/node.*',
     'dist/worker-*',
+    'dist/web.*'
 ];
 
 gulp.task('prepare-packages', ['build-node'], function () {
     gulp.src(RELEASE_SOURCES).pipe(gulp.dest('packaging/BUILD'));
+    gulp.src(['clients/nodejs/node-ui/**/*']).pipe(gulp.dest('packaging/BUILD/node-ui'));
     gulp.src(['clients/nodejs/sample.conf']).pipe(gulp.dest('packaging/BUILD/fakeroot/etc/nimiq'));
     gulp.src(['package.json']).pipe(replace('"architecture": "none"', `"architecture": "${util.env.architecture}"`)).pipe(gulp.dest('packaging/BUILD'));
     gulp.src(['clients/nodejs/nimiq']).pipe(replace('node "\\$SCRIPT_PATH/index.js"', '/usr/share/nimiq/{{ cli_entrypoint }}')).pipe(gulp.dest('packaging/BUILD'));
-    gulp.src(['clients/nodejs/index.js']).pipe(replace('../../dist/node.js', './lib/node.js')).pipe(gulp.dest('packaging/BUILD'));
-    gulp.src(['clients/nodejs/modules/*.js']).pipe(replace('../../../dist/node.js', '../lib/node.js')).pipe(gulp.dest('packaging/BUILD/modules'));
+    gulp.src(['clients/nodejs/index.js', 'clients/nodejs/remote.js', 'clients/nodejs/keytool.js']).pipe(replace('../../dist/node.js', './lib/node.js')).pipe(gulp.dest('packaging/BUILD'));
+    gulp.src(['clients/nodejs/modules/*.js']).pipe(replace('../../../dist/', '../lib/')).pipe(gulp.dest('packaging/BUILD/modules'));
     gulp.src(['node_modules/**/*'], {base: '.', dot: true }).pipe(gulp.dest('packaging/BUILD'));
     gulp.src(RELEASE_LIB).pipe(gulp.dest('packaging/BUILD/lib'));
     gulp.src('build/Release/nimiq_node_generic.node').pipe(gulp.dest('packaging/BUILD/build'));

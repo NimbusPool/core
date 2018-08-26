@@ -37,12 +37,24 @@ describe('Hash', () => {
             .toBe(false, 'because hash1 !== 1');
     });
 
-    it('can hash data with blake2b', (done) => {
-        (async function () {
-            const dataToHash = BufferUtils.fromAscii('hello');
-            const expectedHash = Dummy.hash1;
-            const hash = Hash.blake2b(dataToHash);
-            expect(BufferUtils.toBase64(hash.serialize())).toBe(expectedHash);
-        })().then(done, done.fail);
+    it('can hash data with blake2b', () => {
+        const dataToHash = BufferUtils.fromAscii('hello');
+        const expectedHash = Dummy.hash1;
+        const hash = Hash.blake2b(dataToHash);
+        expect(BufferUtils.toBase64(hash.serialize())).toBe(expectedHash);
+    });
+
+    it('can hash data with sha256', () => {
+        const dataToHash = BufferUtils.fromAscii(Dummy.shaHash.input);
+        const expectedHash = Dummy.shaHash.sha256Hex;
+        const hash = Hash.sha256(dataToHash);
+        expect(BufferUtils.toHex(hash.serialize())).toBe(expectedHash);
+    });
+
+    it('can hash data with sha512', () => {
+        const dataToHash = BufferUtils.fromAscii(Dummy.shaHash.input);
+        const expectedHash = Dummy.shaHash.sha512Hex;
+        const hash = Hash.sha512(dataToHash);
+        expect(BufferUtils.toHex(hash.serialize())).toBe(expectedHash);
     });
 });

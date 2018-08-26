@@ -54,9 +54,13 @@ class PeerScorer {
                 it = this._addresses.rtcIterator();
                 numAddresses = this._addresses.knownRtcAddressesCount;
                 break;
-            case Protocol.RTC | Protocol.WSS:
+            case Protocol.RTC | Protocol.WS:
                 it = IteratorUtils.alternate(this._addresses.rtcIterator(), this._addresses.wsIterator());
                 numAddresses = this._addresses.knownRtcAddressesCount + this._addresses.knownWsAddressesCount;
+                break;
+            case Protocol.RTC | Protocol.WSS:
+                it = IteratorUtils.alternate(this._addresses.rtcIterator(), this._addresses.wssIterator());
+                numAddresses = this._addresses.knownRtcAddressesCount + this._addresses.knownWssAddressesCount;
                 break;
             default:
                 it = this._addresses.iterator();
@@ -108,8 +112,11 @@ class PeerScorer {
                 case Protocol.RTC:
                     it = this._addresses.rtcIterator();
                     break;
-                case Protocol.RTC | Protocol.WSS:
+                case Protocol.RTC | Protocol.WS:
                     it = IteratorUtils.alternate(this._addresses.rtcIterator(), this._addresses.wsIterator());
+                    break;
+                case Protocol.RTC | Protocol.WSS:
+                    it = IteratorUtils.alternate(this._addresses.rtcIterator(), this._addresses.wssIterator());
                     break;
                 default:
                     it = this._addresses.iterator();
