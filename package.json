@@ -111,7 +111,7 @@
     "karma-sauce-launcher": "^1.2.0",
     "merge2": "^1.2.1",
     "node-deb": "^0.10.4",
-    "node-gyp": "^3.6.2",
+    "node-gyp": "^3.7.0",
     "vinyl-buffer": "^1.0.1",
     "vinyl-source-stream": "^2.0.0"
   },
